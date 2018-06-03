@@ -1,0 +1,27 @@
+<div>
+  <div class="row">
+    <div class="col-lg-12 text-center">
+      <h1 class="title">Hashtag Statistics</h1>
+    </div>
+    <div class="col-lg-12 form-group">
+      <table class="table">
+        <thead>
+          <th>Rank</th>
+          <th>Hashtag</th>
+          <th>Times used by User</th>
+          <th>Times used by Global</th>
+        </thead>
+        <tbody>
+         <% for i in 0..@appearance.length-1 %>
+          <tr>
+            <td><%=i+1%></td>
+            <td>#<%=@appearance[i][0]%></td>
+            <td><%=@appearance[i][1]%></td>
+            <td><%=@appearance_times[i]%></td>
+          </tr>
+          <%end%>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
