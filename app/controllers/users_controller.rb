@@ -30,8 +30,10 @@ class UsersController < ApplicationController
                 # elements contain the content of a post
                 dom=@@bot.find_elements(:xpath, '/html/body/span/section/main/div/article/div[1]/div/div/div')
                 for i in dom
-                    dom=i.find_element(:tag_name,'a')['href']
-                    @post_dom.push(dom)   
+                    if i.find_elements(:tag_name,'a').size>0
+                        dom=i.find_element(:tag_name,'a')['href']
+                        @post_dom.push(dom) 
+                    end    
                 end      
             end 
         end
