@@ -1,9 +1,10 @@
 <style>
 .pagination {
+    margin: auto;
     margin-bottom: 10px;
     margin-top: 20px;
-    margin-left: 50px;
     width: 40%;
+    border: 1px solid grey;
     padding: 10px;
 }
 .pagination a {
@@ -50,4 +51,7 @@
               <%end%>
       </tbody>
     </table>
+    <div>
+      <%= paginate @users %>
+    </div>
 </div>
