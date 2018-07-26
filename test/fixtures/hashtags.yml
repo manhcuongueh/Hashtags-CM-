@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  hashtags: MyString
+  use_by_user: 1
+  use_by_global: 1
+
+two:
+  hashtags: MyString
+  use_by_user: 1
+  use_by_global: 1

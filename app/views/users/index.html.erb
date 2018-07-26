@@ -12,12 +12,12 @@
           <th>Times used by Global</th>
         </thead>
         <tbody>
-         <% for i in 0..@appearance.length-1 %>
+         <% for i in @hashtags %>
           <tr>
-            <td><%=i+1%></td>
-            <td>#<%=@appearance[i][0]%></td>
-            <td><%=@appearance[i][1]%></td>
-            <td><%=@appearance_times[i]%></td>
+            <td><%=@hashtags.index(i)+1%></td>
+            <td>#<%=i.hashtags%></td>
+            <td><%=i.use_by_user%></td>
+            <td><%=i.use_by_global%></td>
           </tr>
           <%end%>
         </tbody>

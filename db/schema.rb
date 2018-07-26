@@ -10,12 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_21_012227) do
+ActiveRecord::Schema.define(version: 2018_07_26_044417) do
+
+  create_table "hashtags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "hashtags"
+    t.integer "use_by_user"
+    t.integer "use_by_global"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+  end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
-    t.string "hashtag"
-    t.integer "user_by_user"
-    t.integer "user_by_all"
+    t.string "username"
+    t.string "date_start"
+    t.string "date_end"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

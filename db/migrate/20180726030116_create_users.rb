@@ -1,9 +1,9 @@
 class CreateUsers < ActiveRecord::Migration[5.2]
   def change
     create_table :users do |t|
-      t.string :hashtag
-      t.integer :user_by_user
-      t.integer :user_by_all
+      t.string :username
+      t.string :date_start
+      t.string :date_end
 
       t.timestamps
     end
