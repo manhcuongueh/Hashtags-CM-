@@ -22,10 +22,12 @@ class UsersController < ApplicationController
         #remove data of existing account 
         User.find_each { |c| c.destroy if c.username==insta_url}
         #run chrome
-        options = Selenium::WebDriver::Chrome::Options.new
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        @@bot = Selenium::WebDriver.for :chrome, options: options
+        #options = Selenium::WebDriver::Chrome::Options.new
+        #options.add_argument('--headless')
+        #options.add_argument('--no-sandbox')
+        #@@bot = Selenium::WebDriver.for :chrome, options: options
+        @@bot = Selenium::WebDriver.for :chrome
+        @@bot.manage.window.maximize
         sleep 1
         @@bot.navigate.to "https://www.instagram.com/#{insta_url}"  
         sleep 1   
@@ -51,7 +53,7 @@ class UsersController < ApplicationController
             post_dom=post_dom.uniq
             #Get exactly 100 post
             post_dom=post_dom[0..99]
-
+            k=0
             for i in 0..post_dom.length-1   
                 @@bot.navigate.to "#{post_dom[i]}"
                 # get date of first post and date of last post
@@ -60,32 +62,37 @@ class UsersController < ApplicationController
                 end
                 # pass load more comment 
                 start_time= Time.now
-                while @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@role="button"]').size > 0 do 
+                while @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@role="button"]').size > 0 do
                     @@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a').click
-                    sleep 0.7
-                    if Time.now > start_time + 120
-                        sleep 3
-                        if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@disabled]').size > 0 && k==0
-                        
-                            @@bot.quit()
-                            @@bot = Selenium::WebDriver.for :chrome 
-                            @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
-                            sleep 0.5
-                            #using username and password to login
-                            @@bot.find_element(:id, 'id_username').send_keys 'cuong_manh248'
-                            @@bot.find_element(:id, 'id_password').send_keys '24081991'
-                            @@bot.find_element(:class, 'button-green').click
-                            sleep 0.5
-                            @@bot.navigate.to "#{post_dom[i]}"  
-                            k=1
-                            start_time= Time.now
-                        elsif @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@disabled]').size > 0 && @k==1
-                            @@bot.quit()
-                            @@bot = Selenium::WebDriver.for :chrome 
-                            @@bot.navigate.to "#{post_dom[i]}"
-                            sleep 0.5
-                            @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/section/div/a').click
-                            k=0
+                    sleep 0.5
+                    if (Time.now > start_time + 60)
+                        sleep 3 
+                        if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@disabled=""]').size > 0                    
+                            if k==0 
+                                @@bot.quit()
+                                @@bot = Selenium::WebDriver.for :chrome 
+                                @@bot.manage.window.maximize
+                                @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
+                                sleep 0.5
+                                #using username and password to login
+                                @@bot.find_element(:id, 'id_username').send_keys 'cuong_manh248'
+                                @@bot.find_element(:id, 'id_password').send_keys '24081991'
+                                @@bot.find_element(:class, 'button-green').click
+                                sleep 0.5
+                                @@bot.navigate.to "https://www.instagram.com/#{insta_url}" 
+                                k=1
+                                start_time= Time.now
+                            else  
+                                @@bot.quit()
+                                @@bot = Selenium::WebDriver.for :chrome 
+                                @@bot.manage.window.maximize
+                                @@bot.navigate.to "https://www.instagram.com/#{insta_url}"
+                                sleep 0.5
+                                @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
+                                k=0
+                                start_time= Time.now
+                            end
+                        else
                             start_time= Time.now
                         end
                     end

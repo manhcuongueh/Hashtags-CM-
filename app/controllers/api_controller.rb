@@ -5,8 +5,12 @@ class ApiController < ApplicationController
     end
     def hashtag_json
         username= params[:username]
-        user = User.find_by_username(username)
-        hashtags = user.hashtags
-        render json: hashtags
+        if  User.where(:username => username).present?
+            user = User.find_by_username(username)
+            hashtags = user.hashtags
+            render json: hashtags
+        else
+            render json: "Your account is invalid or not available"
+        end
     end
 end
