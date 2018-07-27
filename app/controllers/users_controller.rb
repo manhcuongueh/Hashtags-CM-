@@ -19,8 +19,6 @@ class UsersController < ApplicationController
         date=[]
         #Get Instagram Url
         insta_url=params[:insta_url]
-        #remove data of existing account 
-        User.find_each { |c| c.destroy if c.username==insta_url}
         #run chrome
         options = Selenium::WebDriver::Chrome::Options.new
         options.add_argument('--headless')
@@ -29,7 +27,10 @@ class UsersController < ApplicationController
         #@@bot = Selenium::WebDriver.for :chrome
         @@bot.manage.window.maximize
         sleep 1
-        @@bot.navigate.to "https://www.instagram.com/#{insta_url}"  
+        #go to account page
+        @@bot.navigate.to "https://www.instagram.com/#{insta_url}"
+        #get account_id
+        username = @@bot.find_element(:xpath, '/html/body/span/section/main/div/header/section/div[1]/h1').text
         sleep 1   
         if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div').size >0 
             @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
@@ -109,9 +110,11 @@ class UsersController < ApplicationController
                 end        
             end
             @@bot.quit()
+            #remove data of existing account 
+            User.find_each { |c| c.destroy if c.username==username}
             #create user 
             @user=User.new(
-                username: insta_url,
+                username: username,
                 date_start: date[0],
                 date_end: date[1]
                 ) 
