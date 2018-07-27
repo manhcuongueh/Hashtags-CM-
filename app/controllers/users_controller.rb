@@ -71,7 +71,11 @@ class UsersController < ApplicationController
                         if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@disabled=""]').size > 0                    
                             if k==0 
                                 @@bot.quit()
-                                @@bot = Selenium::WebDriver.for :chrome 
+                                options = Selenium::WebDriver::Chrome::Options.new
+                                options.add_argument('--headless')
+                                options.add_argument('--no-sandbox')
+                                @@bot = Selenium::WebDriver.for :chrome, options: options
+                                #@@bot = Selenium::WebDriver.for :chrome
                                 @@bot.manage.window.maximize
                                 @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
                                 sleep 0.5
@@ -85,7 +89,11 @@ class UsersController < ApplicationController
                                 start_time= Time.now
                             else  
                                 @@bot.quit()
-                                @@bot = Selenium::WebDriver.for :chrome 
+                                options = Selenium::WebDriver::Chrome::Options.new
+                                options.add_argument('--headless')
+                                options.add_argument('--no-sandbox')
+                                @@bot = Selenium::WebDriver.for :chrome, options: options
+                                #@@bot = Selenium::WebDriver.for :chrome
                                 @@bot.manage.window.maximize
                                 @@bot.navigate.to "https://www.instagram.com/#{insta_url}"
                                 sleep 0.5
