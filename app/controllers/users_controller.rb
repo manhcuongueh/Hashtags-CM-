@@ -45,20 +45,11 @@ class UsersController < ApplicationController
         @@bot = Selenium::WebDriver.for :chrome, options: options
         #@@bot = Selenium::WebDriver.for :chrome
         @@bot.manage.window.maximize
-        @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
-        sleep 0.5
-        #using username and password to login
-        @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
-        @@bot.find_element(:id, 'id_password').send_keys '515173'
-        @@bot.find_element(:class, 'button-green').click
-        sleep 0.5
-        redirect_to @@bot.current_url
-=begin
+        sleep 1
         #go to account page
         @@bot.navigate.to "https://www.instagram.com/#{insta_url}"
         #get account_id
         username = @@bot.find_element(:xpath, '/html/body/span/section/main/div/header/section/div[1]/h1').text
-
         sleep 1   
         if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div').size >0 
             @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
@@ -94,16 +85,16 @@ class UsersController < ApplicationController
                 while @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@role="button"]').size > 0 do
                     @@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a').click
                     sleep 0.5
-                    if (Time.now > start_time)
+                    if (Time.now > start_time + 60)
                         sleep 3 
                         if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/a[@disabled=""]').size > 0                    
                             if k==0 
                                 @@bot.quit()
-                                #options = Selenium::WebDriver::Chrome::Options.new
-                                #options.add_argument('--headless')
-                                #options.add_argument('--no-sandbox')
-                                #@@bot = Selenium::WebDriver.for :chrome, options: options
-                                @@bot = Selenium::WebDriver.for :chrome
+                                options = Selenium::WebDriver::Chrome::Options.new
+                                options.add_argument('--headless')
+                                options.add_argument('--no-sandbox')
+                                @@bot = Selenium::WebDriver.for :chrome, options: options
+                                #@@bot = Selenium::WebDriver.for :chrome
                                 @@bot.manage.window.maximize
                                 @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
                                 sleep 0.5
@@ -112,16 +103,16 @@ class UsersController < ApplicationController
                                 @@bot.find_element(:id, 'id_password').send_keys '515173'
                                 @@bot.find_element(:class, 'button-green').click
                                 sleep 0.5
-                                @@bot.navigate.to "https://www.instagram.com/" 
+                                @@bot.navigate.to "https://www.instagram.com/#{insta_url}" 
                                 k=1
                                 start_time= Time.now
                             else  
                                 @@bot.quit()
-                                 #options = Selenium::WebDriver::Chrome::Options.new
-                                #options.add_argument('--headless')
-                                #options.add_argument('--no-sandbox')
-                                #@@bot = Selenium::WebDriver.for :chrome, options: options
-                                @@bot = Selenium::WebDriver.for :chrome
+                                options = Selenium::WebDriver::Chrome::Options.new
+                                options.add_argument('--headless')
+                                options.add_argument('--no-sandbox')
+                                @@bot = Selenium::WebDriver.for :chrome, options: options
+                                #@@bot = Selenium::WebDriver.for :chrome
                                 @@bot.manage.window.maximize
                                 @@bot.navigate.to "https://www.instagram.com/#{insta_url}"
                                 sleep 0.5
@@ -224,6 +215,5 @@ class UsersController < ApplicationController
             @@bot.quit()
             redirect_to root_path
         end
-=end
     end
 end
