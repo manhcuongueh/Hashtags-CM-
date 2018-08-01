@@ -4,6 +4,8 @@ class CreateHashtags < ActiveRecord::Migration[5.2]
       t.string :hashtags
       t.integer :use_by_user
       t.integer :use_by_global
+      t.string :avai
+      t.integer :user_id
 
       t.timestamps
     end

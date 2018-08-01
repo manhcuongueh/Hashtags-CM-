@@ -4,8 +4,12 @@ one:
   hashtags: MyString
   use_by_user: 1
   use_by_global: 1
+  avai: MyString
+  user_id: 1
 
 two:
   hashtags: MyString
   use_by_user: 1
   use_by_global: 1
+  avai: MyString
+  user_id: 1

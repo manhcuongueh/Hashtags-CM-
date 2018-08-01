@@ -2,6 +2,11 @@
   <div class="row">
     <div class="col-lg-12 text-center">
       <h1 class="title">Hashtag Statistics</h1>
+      <span style ="font-weight:bold;padding-right:30px;"> ID : <%=@user.username%></span>
+      <span style ="font-weight:bold;padding-right:30px;">Followers : <%=@user.followers%></span>
+      <span style ="font-weight:bold;padding-right:30px;">Level : <%=@user.level%></span>
+      <span style ="font-weight:bold;padding-right:30px;">Score : <%=@user.score%></span>
+      <span style ="font-weight:bold;padding-right:30px;">Sum : <%=@user.sum%></span>
     </div>
     <div class="col-lg-12 form-group">
       <table class="table">
@@ -10,6 +15,7 @@
           <th>Hashtag</th>
           <th>Times used by User</th>
           <th>Times used by Global</th>
+          <th>Availability</th>
         </thead>
         <tbody>
          <% for i in @hashtags %>
@@ -18,6 +24,7 @@
             <td>#<%=i.hashtags%></td>
             <td><%=i.use_by_user%></td>
             <td><%=i.use_by_global%></td>
+            <td><%=i.avai%></td>
           </tr>
           <%end%>
         </tbody>

@@ -4,8 +4,16 @@ one:
   username: MyString
   date_start: MyString
   date_end: MyString
+  followers: 1
+  level: MyString
+  score: 1.5
+  sum: 1
 
 two:
   username: MyString
   date_start: MyString
   date_end: MyString
+  followers: 1
+  level: MyString
+  score: 1.5
+  sum: 1

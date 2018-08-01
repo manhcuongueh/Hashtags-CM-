@@ -11,6 +11,18 @@ class UsersController < ApplicationController
     end
     
     def create
+        selenium_code
+    end
+    def delete
+        @id=params[:id]
+        @user = User.find_by_id(@id)
+        @user.destroy
+        redirect_to root_path
+    end
+
+
+    ##Selenium Code
+    def selenium_code
         #declare dom of posts
         post_dom=[]
         #declare hashtags of posts
@@ -19,6 +31,13 @@ class UsersController < ApplicationController
         date=[]
         #Get Instagram Url
         insta_url=params[:insta_url]
+        #get followers
+        begin
+            doc = Nokogiri::HTML(open("https://www.instagram.com/#{insta_url}"))
+            acc = doc.text
+            acc = acc.split('"edge_followed_by":{"count":')[1]
+            followers = (acc.split('},"followed_by_viewer"')[0]).to_i            
+        end
         #run chrome
         options = Selenium::WebDriver::Chrome::Options.new
         options.add_argument('--headless')
@@ -124,13 +143,15 @@ class UsersController < ApplicationController
             @user=User.new(
                 username: username,
                 date_start: date[0],
-                date_end: date[1]
+                date_end: date[1],
+                followers: followers
                 ) 
             #calculate appearance times
             appearance = hashtags.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
             appearance = appearance.sort_by {|_key, value| value}
             appearance = appearance.last(20).reverse
             #Crawl used time by global
+            sum =0; 
             for i in appearance
                 begin
                     #@@bot.navigate.to "https://www.instagram.com/explore/tags/#{URI.encode(i[0])}"
@@ -139,29 +160,60 @@ class UsersController < ApplicationController
                     appearance_time = doc.text
                     appearance_time = appearance_time.split('"edge_hashtag_to_media":{"count":')[1]
                     appearance_time = appearance_time.split(',"page_info":{"')[0]
+                    #get availability
+                    if appearance_time.to_i > 0.16*followers
+                        availability = "X"
+                    else
+                        availability = "0"
+                    end
+                    #get sum 
+                    if availability =="0" && appearance.index(i) < 5
+                        sum = sum + i[1] * appearance_time.to_i
+                    end
                     @user.hashtags.new(
                         hashtags: i[0], 
                         use_by_user:i[1],
                         use_by_global: appearance_time,
+                        avai: availability
                         )
-                    @user.save
                     rescue OpenURI::HTTPError=> e
                         if e.message == '404 Not Found'   
                             appearance_time =-1
                         end
                 end
             end
-        redirect_to index_path(id: @user.id)
+            #get score
+            score = sum.to_f/followers
+            #get level
+            case score
+            when 0..0.02
+              level = "C-"
+            when 0.02..0.06
+                level = "C"
+            when 0.06..0.1
+                level = "C+"
+            when 0.1..0.25
+                level = "B-"
+            when 0.25..0.5
+                level = "B"
+            when 0.5..1
+                level = "B+"
+            when 1..2
+                level = "A-"
+            when 2..5
+                level = "A"
+            else
+               level = "A+"
+            end
+            @user.sum = sum
+            @user.score = score
+            @user.level = level
+            @user.save
+            redirect_to index_path(id: @user.id)
         else 
             flash[:danger] = "Please enter the valid username!"
             @@bot.quit()
             redirect_to root_path
         end
-    end
-    def delete
-        @id=params[:id]
-        @user = User.find_by_id(@id)
-        @user.destroy
-        redirect_to root_path
     end
 end
