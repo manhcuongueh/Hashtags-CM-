@@ -52,8 +52,7 @@ class UsersController < ApplicationController
         @@bot.find_element(:id, 'id_password').send_keys '515173'
         @@bot.find_element(:class, 'button-green').click
         sleep 0.5
-        @@bot.navigate.to "https://www.instagram.com/"
-        @t = @@bot.find_element(:xpath, '/html/body/span/section/main/section/div[3]/div[1]/div/div[2]/div[1]').text
+        redirect_to @@bot.current_url
 =begin
         #go to account page
         @@bot.navigate.to "https://www.instagram.com/#{insta_url}"
