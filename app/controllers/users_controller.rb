@@ -116,6 +116,22 @@ class UsersController < ApplicationController
         #Get Instagram Url
         insta_url=params[:insta_url]
         #get followers
+        list_acc = ['___angevivi','__leeheeeun__','_bysoy','_hyoseung','71.an','am01.30','applekim2','bbu___','bk_kimm','blank9_yerim','boori_boo',
+            'byminawithyou','butfitseoul','cholyncom','daldal_cong','de_silhouette',
+            'delight_hyeon','derang_onni','endorphin.oh','elegance_choi','erineeeeee','go__bambi','gusojeong','hari_ya','haumjie',
+            'haute_n_doudou','heididrinkslove','hyejung_belle','hwangbarbie','hyo_82','i_am_a_dancer_2341','iamaflower',
+            'jangmini','jeenayoon','jihye.pumpkin','jjeung_s2','jjoy_oo54','jwjw0317','kwrhome','lavie_rim','leeemijeong',
+            'le_cormang','lillang_de_beaute','lovable.mh','lovelip_jin','madamebree_','mangdoo_noona',
+            'manyo_yoojin','maylaena','mimiciel','mimiwor','minsshop_jm','mirip_jihyo','miumiusue','monojade',
+            'mynewbae_official','ohttomom','pinksecret85','pu___reum','re_elly_','reticella','seolhwa939',
+            'shortbutstunning','shuni_kaeun','siyeon0220','sunmiub','suzymin','thanks_kim','theorohaejung','tingkerhee',
+            'ttovely__','twinkle_sunny7','u__jee','vivamoon','vivi_saena','vvery_woony','wanna_bp','withnami','xxoziin',
+            'y_aile','yejinkkk','yeonpilates','yjkang34','yoomth','yoongchic','yoonmida','you_mer','yuung0204','yxxnii']
+            list_acc = list_acc.reverse
+            for i in list_acc
+                User.create(username: i)
+            end
+=begin
         begin
             doc = Nokogiri::HTML(open("https://www.instagram.com/#{insta_url}"))
             acc = doc.text
@@ -299,5 +315,6 @@ class UsersController < ApplicationController
             @@bot.quit()
             redirect_to root_path
         end
+=end
     end
 end
