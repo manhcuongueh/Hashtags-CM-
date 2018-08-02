@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
     def index    
-        id=params[:id]
-        @user=User.find_by_id(id)
+        @id=params[:id]
+        @user=User.find_by_id(@id)
         @hashtags=@user.hashtags
     end
     def new
@@ -13,9 +13,11 @@ class UsersController < ApplicationController
     def create
         selenium_code
     end
+    
+    
     def delete
-        @id=params[:id]
-        @user = User.find_by_id(@id)
+        id=params[:id]
+        @user = User.find_by_id(id)
         @user.destroy
         redirect_to root_path
     end
@@ -99,8 +101,8 @@ class UsersController < ApplicationController
                                 @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
                                 sleep 0.5
                                 #using username and password to login
-                                @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
-                                @@bot.find_element(:id, 'id_password').send_keys '515173'
+                                @@bot.find_element(:id, 'id_username').send_keys 'cuong_manh248'
+                                @@bot.find_element(:id, 'id_password').send_keys '24081991'
                                 @@bot.find_element(:class, 'button-green').click
                                 sleep 0.5
                                 @@bot.navigate.to "https://www.instagram.com/#{insta_url}" 
@@ -216,4 +218,49 @@ class UsersController < ApplicationController
             redirect_to root_path
         end
     end
+=begin
+---------------------------------***********************--------------------------
+    This area is code to save data to excel file
+---------------------------------***********************--------------------------
+=end
+    def write_excel
+        #get param
+        id=params[:id]
+        @user = User.find_by_id(id)
+        @hashtags= @user.hashtags
+        #generate new Excel file
+        workbook = RubyXL::Workbook.new
+        worksheet=workbook[0]
+        #save information for all post
+        worksheet.add_cell(0, 1, "ID")
+        worksheet.add_cell(0, 2, "FOLLOWERS")
+        worksheet.add_cell(0, 3, "LEVEL")
+        worksheet.add_cell(0, 4, "SCORE")
+        worksheet.add_cell(0, 5, "SUM")
+        worksheet.add_cell(1, 1, @user.username)
+        worksheet.add_cell(1, 2, @user.followers)
+        worksheet.add_cell(1, 3, @user.level)
+        worksheet.add_cell(1, 4, @user.score)
+        worksheet.add_cell(1, 5, @user.sum)
+        #write hashtags
+        worksheet.add_cell(3, 0, "RANK")
+        worksheet.add_cell(3, 1, "HASHTAG")
+        worksheet.add_cell(3, 2, "TIMES")
+        worksheet.add_cell(3, 3, "GLOBAL TIMES")
+        worksheet.add_cell(3, 4, "VALUE")
+        worksheet.add_cell(3, 5, "AVAILABILITY")
+        i=0
+        for hashtag in @hashtags
+             worksheet.add_cell(i+4, 0, i+1)
+             worksheet.add_cell(i+4, 1, hashtag.hashtags)
+             worksheet.add_cell(i+4, 2, hashtag.use_by_user)
+             worksheet.add_cell(i+4, 3, hashtag.use_by_global)
+             worksheet.add_cell(i+4, 4, hashtag.avai == "0" ? hashtag.use_by_global*hashtag.use_by_user : 0 )
+             worksheet.add_cell(i+4, 5, hashtag.avai)  
+             i=i+1   
+        end
+            #send
+            send_data( workbook.stream.string, :filename => "#{@user.username}-hashtags.xlsx" )    
+    end
+   
 end

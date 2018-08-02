@@ -5,5 +5,9 @@ Rails.application.routes.draw do
   post '' => 'users#delete'
   get  'api/user' => 'api#user_json'
   get  'api/hashtag' => 'api#hashtag_json'
+  get  'new/percent' => 'percent#new_percent'
+  get  'percent' => 'percent#change_percent'
+  post 'index/download' => 'users#write_excel'
+  post 'percent/download' => 'percent#write_excel'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
