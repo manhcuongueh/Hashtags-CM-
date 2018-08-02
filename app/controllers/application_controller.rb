@@ -3,10 +3,8 @@ class ApplicationController < ActionController::Base
     def set_page
         id = params[:id]
         if id.nil?
-          @link=''
         else
           @link_account="index?id=#{id}"
-          @link_percent="new/percent?id=#{id}"
         end
   
       end

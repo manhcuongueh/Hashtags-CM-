@@ -2,12 +2,25 @@
   <div class="row">
     <div class="col-lg-12 text-center">
       <h1 class="title">Hashtag Statistics</h1>
-      <span style ="font-weight:bold;padding-right:30px;"> ID : <%=@user.username%></span>
-      <span style ="font-weight:bold;padding-right:30px;">Followers : <%=@user.followers%></span>
-      <span style ="font-weight:bold;padding-right:30px;">Level : <%=@user.level%></span>
-      <span style ="font-weight:bold;padding-right:30px;">Score : <%=@user.score%></span>
-      <span style ="font-weight:bold;padding-right:30px;">Sum : <%=@user.sum%></span>
-      <span style ="font-weight:bold;padding-right:30px;"><%= button_to "Download", index_download_path(id: @id), class: 'btn btn-primary' %></span>
+      <%= form_tag('/index', :method => :get) do %>
+      <table align="center" >
+          <td style ="font-weight:bold;padding-right:30px;">Percentage : <%=@percentage%>%</td>
+          <td style ="font-weight:bold;padding-right:30px;">ID : <%=@user.username%></td>
+          <td style ="font-weight:bold;padding-right:30px;">Followers : <%=@user.followers%></td>
+          <td style ="font-weight:bold;padding-right:30px;">Level : <%=@user.level%></td>
+          <td style ="font-weight:bold;padding-right:30px;">Score : <%=@user.score%></td>
+          <td style ="font-weight:bold;padding-right:70px;">Sum : <%=@user.sum%></td>
+          <td style ="padding-right:15px;"> 
+            <%= text_field_tag :percent, nil, placeholder: 'Enter a percentage...', class: "col-lg-12" %>
+            <%= hidden_field_tag 'id', @id %>
+          </td>
+          <td style ="padding-right:15px;">
+            <%= submit_tag "Submit", class: "btn btn-info"%>
+          </td>
+           <% end %>
+          <td><%= button_to "Download", index_download_path(id: @id, percent: @percentage), class: 'btn btn-primary' %></td>
+      </table>
+      <br>
     </div>
     <div class="col-lg-12 form-group">
       <table class="table">
