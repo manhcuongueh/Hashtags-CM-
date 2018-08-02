@@ -109,7 +109,7 @@ class UsersController < ApplicationController
     def selenium_code
         list_acc = ['shortbutstunning','shuni_kaeun','siyeon0220','sunmiub','suzymin','thanks_kim','theorohaejung','tingkerhee',
             'ttovely__','twinkle_sunny7','u__jee','vivamoon','vivi_saena','vvery_woony','wanna_bp','withnami','xxoziin',
-            'y_aile','yejinkkk','yeonpilates','yjkang34','yoomth','yoongchic','yoonmida','you_mer','yuung0204','yxxnii']
+            'y_aile','yejinkkk','yeonpilates','yjkang34','yoomth','yoongchic','yoonmida','you_mer']
             list_acc = list_acc.reverse
         for acc in list_acc
             #declare dom of posts
