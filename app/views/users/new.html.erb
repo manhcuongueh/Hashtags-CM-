@@ -37,17 +37,15 @@
         <th>Date End</th>
       </thead>
       <tbody>
-        <% i=1%>
           <% @users.each do |user|%>
             <tr>
-              <td><%=i%></td>
+              <td><%=@users_all.index(user)+1%></td>
               <td><b><%=user.username%></b></td>
               <td><%=user.date_start%></td>
               <td><%=user.date_end%></td>
               <td><%= link_to "<button class='btn btn-info'>Detail</button>".html_safe , index_path(id: user.id) %></td>
               <td style= "padding: 5px;"><%= button_to "Delete", root_path(id: user.id), data: {confirm: 'Are you sure to delete this account?'}, class:  'btn btn-danger'%></td>
             </tr>
-            <% i=i+1%>
               <%end%>
       </tbody>
     </table>
