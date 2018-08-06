@@ -52,6 +52,7 @@ class UsersController < ApplicationController
     def new
         @users_all = User.all
         @users_all=@users_all.reverse
+        # paging area
         @users=Kaminari.paginate_array(@users_all).page(params[:page]).per(10)
     end
     
