@@ -1,10 +1,12 @@
 class UsersController < ApplicationController
     def index    
+        #defaut view
         if params[:percent].nil?
             @id=params[:id]
             @user=User.find_by_id(@id)
             @hashtags=@user.hashtags
             @percentage = 16
+        #view based on percentage
         else
             @percentage=params[:percent]
             @id=params[:id]
