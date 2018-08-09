@@ -1,0 +1,35 @@
+
+<div class="row">
+    <div class="col-lg-12">
+      <h1 class="title text-center">Respond percentage</h1>
+      <h4 align ="center">All recentpost:<%=@user.repond_percentage*100%> %</h4>
+    </div>
+    <br></br>
+    <div class="col-lg-12 form-group">
+      <table class="table">
+        <thead>
+          <th>No</th>
+          <th>Image</th>
+          <th>Link</th>
+          <th>Respond Times</th>
+          <th>Total Comment</th>
+          <th>Percentage</th>
+        </thead>
+        <tbody>
+        <% i=0%>  
+         <% @percentages.each do |p|%>
+          <tr>
+            <td><%=i+1%></td>
+            <td><%=link_to image_tag(p.image, height: '100', width: '100'), p.image %></td>
+            <td><%=link_to "#{p.link}", p.link%></td>
+            <td><%=p.reply_time%></td>
+            <td><%=p.total_cm%></td>
+            <td><%=(p.percentage*100).round(2) %>%</td>
+            <%i=i+1%>
+          </tr>  
+        <%end%>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

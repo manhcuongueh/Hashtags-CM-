@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_30_085916) do
+ActiveRecord::Schema.define(version: 2018_08_08_091747) do
 
   create_table "hashtags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "hashtags"
@@ -22,16 +22,28 @@ ActiveRecord::Schema.define(version: 2018_07_30_085916) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "percentages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "link"
+    t.string "image"
+    t.integer "reply_time"
+    t.integer "total_cm"
+    t.float "percentage"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "username"
     t.string "date_start"
     t.string "date_end"
     t.integer "followers"
     t.string "level"
-    t.float "score"
+    t.decimal "score", precision: 12, scale: 2
     t.integer "sum"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "repond_percentage"
   end
 
 end

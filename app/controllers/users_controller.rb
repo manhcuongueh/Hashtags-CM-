@@ -52,8 +52,14 @@ class UsersController < ApplicationController
     def new
         @users_all = User.all
         @users_all=@users_all.reverse
+        #search
+        username = params[:username]
+        if !username.nil?
+        @users_all = @users_all.find_all{|w| w.username.include?(username)}
+        end
         # paging area
         @users=Kaminari.paginate_array(@users_all).page(params[:page]).per(10)
+        
     end
     
     def create
@@ -110,6 +116,8 @@ class UsersController < ApplicationController
 
     ##Selenium Code
     def selenium_code
+        #initialize user
+        @user = User.new
         #declare dom of posts
         post_dom=[]
         #declare hashtags of posts
@@ -127,11 +135,11 @@ class UsersController < ApplicationController
             followers = (acc.split('},"followed_by_viewer"')[0]).to_i            
         end
         #run chrome
-        options = Selenium::WebDriver::Chrome::Options.new
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        @@bot = Selenium::WebDriver.for :chrome, options: options
-        #@@bot = Selenium::WebDriver.for :chrome
+        #options = Selenium::WebDriver::Chrome::Options.new
+        #options.add_argument('--headless')
+        #options.add_argument('--no-sandbox')
+        #@@bot = Selenium::WebDriver.for :chrome, options: options
+        @@bot = Selenium::WebDriver.for :chrome
         @@bot.manage.window.maximize
         sleep 1
         #go to account page
@@ -151,7 +159,9 @@ class UsersController < ApplicationController
                     dom=@@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div')
                     for i in dom
                         if i.find_elements(:tag_name,'a').size>0
-                            dom=i.find_element(:tag_name,'a')['href']
+                            dom=[];
+                            dom[0]=i.find_element(:tag_name,'a')['href']
+                            dom[1]=i.find_element(:tag_name,'img')['src']
                             post_dom.push(dom) 
                         end    
                     end      
@@ -163,7 +173,7 @@ class UsersController < ApplicationController
             post_dom=post_dom[0..99]
             k=0
             for i in 0..post_dom.length-1   
-                @@bot.navigate.to "#{post_dom[i]}"
+                @@bot.navigate.to "#{post_dom[i][0]}"
                 # get date of first post and date of last post
                 if i==0 ||i==post_dom.length-1 
                     date.push(@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[2]/a/time')['title'])
@@ -187,11 +197,11 @@ class UsersController < ApplicationController
                                 @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
                                 sleep 0.5
                                 #using username and password to login
-                                @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
-                                @@bot.find_element(:id, 'id_password').send_keys '515173'
+                                @@bot.find_element(:id, 'id_username').send_keys 'cuong_manh248'
+                                @@bot.find_element(:id, 'id_password').send_keys '24081991'
                                 @@bot.find_element(:class, 'button-green').click
                                 sleep 0.5
-                                @@bot.navigate.to "#{post_dom[i]}" 
+                                @@bot.navigate.to "#{post_dom[i][0]}" 
                                 k=1
                                 start_time= Time.now
                             else  
@@ -202,7 +212,7 @@ class UsersController < ApplicationController
                                 @@bot = Selenium::WebDriver.for :chrome, options: options
                                 #@@bot = Selenium::WebDriver.for :chrome
                                 @@bot.manage.window.maximize
-                                @@bot.navigate.to "#{post_dom[i]}"
+                                @@bot.navigate.to "#{post_dom[i][0]}"
                                 sleep 0.5
                                 @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
                                 k=0
@@ -213,27 +223,40 @@ class UsersController < ApplicationController
                         end
                     end
                 end
-                # find hashtag
+                
                 if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul').size>0      
-                    dom=@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul')
-                    dom=dom.find_elements(:tag_name, 'a')
-                    for i in dom
-                        if i.text.include? "#"      
-                            hashtags.push(i.text.remove("#"))
+                    dom_comment=@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul')
+                    #times Instagramer answer comments
+                    reply_time=-1
+                    #find hashtags
+                    dom_a=dom_comment.find_elements(:tag_name, 'a')
+                    for d in dom_a
+                        if d.text.include? "#"      
+                            hashtags.push(d.text.remove("#"))
+                        end
+                        if d.text == username
+                            reply_time=reply_time+1
                         end
                     end  
-                end        
+                    #find percentage
+                    dom_li=dom_comment=@@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li')
+                    dom_li.shift   
+                    #set percentage    
+                    if dom_li.length== 0
+                        percentage =0
+                    else
+                        percentage = reply_time.to_f/dom_li.length
+                    end
+                end 
+                    @user.percentages.new(
+                        link: post_dom[i][0],
+                        image: post_dom[i][1],
+                        reply_time: reply_time,
+                        total_cm: dom_li.length,
+                        percentage: percentage
+                    )
             end
             @@bot.quit()
-            #remove data of existing account 
-            User.find_each { |c| c.destroy if c.username==username}
-            #create user 
-            @user=User.new(
-                username: username,
-                date_start: date[0],
-                date_end: date[1],
-                followers: followers
-                ) 
             #calculate appearance times
             appearance = hashtags.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
             appearance = appearance.sort_by {|_key, value| value}
@@ -293,9 +316,25 @@ class UsersController < ApplicationController
             else
                level = "A+"
             end
-            @user.sum = sum
-            @user.score = score
-            @user.level = level
+             #remove data of existing account 
+             User.find_each { |c| c.destroy if c.username==username}
+             #calculate respond percentage
+             total_reply_times=0
+             all_cm= 0
+             for post in @user.percentages
+                total_reply_times = total_reply_times + post.reply_time
+                all_cm = all_cm+post.total_cm
+             end
+             respond_percentage=total_reply_times.to_f/all_cm
+             #save user 
+                @user.username = username
+                @user.date_start = date[0]
+                @user.date_end =  date[1]
+                @user.followers= followers
+                @user.sum = sum
+                @user.score = score
+                @user.level = level
+                @user.repond_percentage = respond_percentage
             @user.save
             redirect_to index_path(id: @user.id)
         else 

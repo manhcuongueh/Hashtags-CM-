@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   root 'users#new'
   get  'index' => 'users#index'
+  get  'percentage' => 'percentage#show'
   post 'index' => 'users#create'
   post '' => 'users#delete'
   get  'api/user' => 'api#user_json'

@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  link: MyString
+  image: MyString
+  reply_time: 1
+  total_cm: 1
+  percentage: 1.5
+  user_id: 1
+
+two:
+  link: MyString
+  image: MyString
+  reply_time: 1
+  total_cm: 1
+  percentage: 1.5
+  user_id: 1

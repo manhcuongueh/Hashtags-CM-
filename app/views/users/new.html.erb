@@ -28,6 +28,16 @@
 </div>
 
 <div class="container">
+  <%= form_tag('/', :method => :get) do %>
+      <table>
+          <td style ="padding-right:15px;"> 
+            <%= text_field_tag :username, params[:username], placeholder: 'Enter an ID', class: "col-lg-12" %>
+          </td>
+          <td>
+            <%= submit_tag "Search", class: "btn btn-info"%>
+          </td>
+           <% end %>
+      </table>
     <hr>
     <table width="800">
       <thead>
