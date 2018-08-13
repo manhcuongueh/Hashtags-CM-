@@ -116,40 +116,33 @@ class UsersController < ApplicationController
 
     ##Selenium Code
     def selenium_code
-        list_acc = ['y_aile','yejinkkk','yeonpilates','yjkang34','yoomth','yoongchic','yoonmida','you_mer','yuung0204','yxxnii','y_rinnnnnn','yen_sta','hslee1015','jju_dresser','mc_hyangju']
-            list_acc = list_acc.reverse
-        for acc in list_acc
-            #declare dom of posts
-            post_dom=[]
-            #declare hashtags of posts
-            hashtags=[]
-            #declare date 
-            date=[]
-            #Get Instagram Url
-            insta_url=params[:insta_url]
-            #get followers
-            @user=User.new
-            begin
-                doc = Nokogiri::HTML(open("https://www.instagram.com/#{acc}"))
-                followers = doc.text
-                followers = followers.split('"edge_followed_by":{"count":')[1]
-                followers = (followers.split('},"followed_by_viewer"')[0]).to_i            
-            end
-            #run chrome
-            options = Selenium::WebDriver::Chrome::Options.new
-            options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            @@bot = Selenium::WebDriver.for :chrome, options: options
-            #@@bot = Selenium::WebDriver.for :chrome
-            @@bot.manage.window.maximize
-            sleep 1
-            #go to account page
-            @@bot.navigate.to "https://www.instagram.com/#{acc}"
-            #get account_id
-            username = @@bot.find_element(:xpath, '/html/body/span/section/main/div/header/section/div[1]/h1').text
-            sleep 1   
+        #initialize user
+        @user = User.new
+        #declare dom of posts
+        post_dom=[]
+        #declare hashtags of posts
+        hashtags=[]
+        #declare date 
+        date=[]
+        #Get Instagram Url
+        insta_url=params[:insta_url]
+        #run chrome
+        options = Selenium::WebDriver::Chrome::Options.new
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        @@bot = Selenium::WebDriver.for :chrome, options: options
+        #@@bot = Selenium::WebDriver.for :chrome
+        @@bot.manage.window.maximize
+        sleep 1
+        #go to account page
+        @@bot.navigate.to "https://www.instagram.com/#{insta_url}"
+        sleep 1   
         if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div').size >0 
             @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
+            #get followers
+            
+            #get account_id
+            username = @@bot.find_element(:xpath, '/html/body/span/section/main/div/header/section/div[1]/h1').text
             #scroll down the account page and save dom
             for i in 0..8
                 @@bot.action.send_keys(:end).perform
@@ -337,12 +330,11 @@ class UsersController < ApplicationController
                 @user.level = level
                 @user.repond_percentage = respond_percentage
             @user.save
-                #redirect_to index_path(id: @user.id)
-            else 
-                flash[:danger] = "Please enter the valid username!"
-                @@bot.quit()
-                #redirect_to root_path
-            end
+            redirect_to index_path(id: @user.id)
+        else 
+            flash[:danger] = "Please enter the valid username!"
+            @@bot.quit()
+            redirect_to root_path
         end
     end
 end
