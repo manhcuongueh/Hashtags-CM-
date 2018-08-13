@@ -140,7 +140,12 @@ class UsersController < ApplicationController
         if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div').size >0 
             @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
             #get followers
-            
+            begin
+                doc = Nokogiri::HTML(open(@@bot.current_url))
+                acc = doc.text
+                acc = acc.split('"edge_followed_by":{"count":')[1]
+                followers = (acc.split('},"followed_by_viewer"')[0]).to_i            
+            end
             #get account_id
             username = @@bot.find_element(:xpath, '/html/body/span/section/main/div/header/section/div[1]/h1').text
             #scroll down the account page and save dom
