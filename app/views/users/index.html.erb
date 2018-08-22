@@ -4,10 +4,10 @@
       <h1 class="title">Hashtag Statistics</h1>
       <%= form_tag('/index', :method => :get) do %>
       <table align="center" >
+      <tr>
           <td style ="font-weight:bold;padding-right:10px;">Percentage: <%=@percentage%>%</td>
           <td style ="font-weight:bold;padding-right:10px;">ID: <%=@user.username%></td>
           <td style ="font-weight:bold;padding-right:10px;">Followers: <%=@user.followers%></td>
-          <td style ="font-weight:bold;padding-right:10px;">RP: <%=(@user.repond_percentage)*100%>% </td>
           <td style ="font-weight:bold;padding-right:10px;">Level: <%=@user.level%></td>
           <td style ="font-weight:bold;padding-right:10px;">Score: <%=@user.score.round(2)%></td>
           <td style ="font-weight:bold;padding-right:20px;">Sum: <%=@user.sum%></td>
@@ -21,6 +21,13 @@
            <% end %>
           <td><%= button_to "Download", index_download_path(id: @id, percent: @percentage), class: 'btn btn-primary' %></td>
           <td><%= link_to "<button class='btn btn-primary'>View Percentage</button>".html_safe , percentage_path(id: @user.id) %></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td style ="font-weight:bold;padding-right:10px;">RP: <%=(@user.repond_percentage)*100%>% </td>
+          <td style ="font-weight:bold;padding-right:10px;">All reponses: <%=@respond_times%></td>
+          <td style ="font-weight:bold;padding-right:10px;">All Comments: <%=@all_comments%></td>
+      </tr>
       </table>
       <br>
     </div>

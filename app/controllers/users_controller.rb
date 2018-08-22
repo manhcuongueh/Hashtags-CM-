@@ -1,17 +1,18 @@
 class UsersController < ApplicationController
     def index    
         #defaut view
+        @id=params[:id]
+        @user = User.find_by_id(@id)
+        @hashtags=@user.hashtags
+        @respond_percentages = @user.percentages
+        @respond_times = @respond_percentages.inject(0){|sum,x| sum + x.reply_time }
+        @all_comments = @respond_percentages.inject(0){|sum,x| sum + x.total_cm }
         if params[:percent].nil?
             @id=params[:id]
-            @user=User.find_by_id(@id)
-            @hashtags=@user.hashtags
             @percentage = 16
         #view based on percentage
         else
             @percentage=params[:percent]
-            @id=params[:id]
-            @user = User.find_by_id(@id)
-            @hashtags=@user.hashtags
             @user.sum=0
             for i in @hashtags
                 if i.use_by_global > (@percentage.to_f/100)*@user.followers
@@ -200,8 +201,8 @@ class UsersController < ApplicationController
                                 @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
                                 sleep 0.5
                                 #using username and password to login
-                                @@bot.find_element(:id, 'id_username').send_keys 'cuong_manh248'
-                                @@bot.find_element(:id, 'id_password').send_keys '24081991'
+                                @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
+                                @@bot.find_element(:id, 'id_password').send_keys '515173'
                                 @@bot.find_element(:class, 'button-green').click
                                 sleep 0.5
                                 @@bot.navigate.to "#{post_dom[i][0]}"  
