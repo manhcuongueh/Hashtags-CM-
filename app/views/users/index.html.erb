@@ -46,7 +46,7 @@
          <% for i in @hashtags %>
           <tr>
             <td><%=@hashtags.index(i)+1%></td>
-            <td>#<%=i.hashtags%></td>
+            <td><%=i.hashtags%></td>
             <td><%=i.use_by_user%></td>
             <td><%=i.use_by_global%></td>
             <td><%= i.avai == "0" ? i.use_by_global*i.use_by_user : 0 %></td>

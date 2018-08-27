@@ -46,6 +46,7 @@ class UsersController < ApplicationController
                     @user.sum = @user.sum + (i.use_by_user) * (i.use_by_global)
                 end
             end
+            #get score
             @user.score = @user.sum.to_f/@user.followers
                 #get level
                 case @user.score
@@ -193,7 +194,7 @@ class UsersController < ApplicationController
             #Get exactly 100 post
             post_dom=post_dom[0..99]
             k=0
-            for i in 0..post_dom.length-1   
+            for i in 0..post_dom.length-1  
                 @@bot.navigate.to "#{post_dom[i][0]}"
                 # get date of first post and date of last post
                 if i==0 ||i==post_dom.length-1 
@@ -258,7 +259,7 @@ class UsersController < ApplicationController
                     dom_a=dom_comment.find_elements(:tag_name, 'a')
                     for d in dom_a
                         if d.text.include? "#"      
-                            hashtags.push(d.text.remove("#"))
+                            hashtags.push(d.text)
                         end
                         if d.text == username
                             reply_time=reply_time+1
@@ -282,7 +283,6 @@ class UsersController < ApplicationController
                         percentage: percentage
                     )
             end
-            @@bot.quit()
             #calculate appearance times
             appearance = hashtags.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
             appearance = appearance.sort_by {|_key, value| value}
@@ -290,13 +290,14 @@ class UsersController < ApplicationController
             #Crawl used time by global
             sum =0; 
             for i in appearance
-                begin
-                    #@@bot.navigate.to "https://www.instagram.com/explore/tags/#{URI.encode(i[0])}"
-                    url=URI.parse "https://www.instagram.com/explore/tags/#{URI.encode(i[0])}"
-                    doc = Nokogiri::HTML(open(url))
-                    appearance_time = doc.text
-                    appearance_time = appearance_time.split('"edge_hashtag_to_media":{"count":')[1]
-                    appearance_time = appearance_time.split(',"page_info":{"')[0]
+                @@bot.navigate.to "https://www.instagram.com/#{username}"
+                @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').send_keys i[0]
+                while @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a[1]/div/div/div[2]').size==0
+                    sleep 1.0
+                end
+                #hashtags -global use
+                appearance_time = @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a/div/div/div[2]/span/span').text
+                appearance_time =appearance_time.gsub(',','').to_i
                     #get availability
                     if appearance_time.to_i > 0.16*followers
                         availability = "X"
@@ -313,12 +314,8 @@ class UsersController < ApplicationController
                         use_by_global: appearance_time,
                         avai: availability
                         )
-                    rescue OpenURI::HTTPError=> e
-                        if e.message == '404 Not Found'   
-                            appearance_time =-1
-                        end
-                end
             end
+            @@bot.quit()
             #get score
             score = sum.to_f/followers
             #get level
@@ -366,6 +363,7 @@ class UsersController < ApplicationController
         else 
             flash[:danger] = "Please enter the valid username!"
             @@bot.quit()
+           
             redirect_to root_path
         end
     end
