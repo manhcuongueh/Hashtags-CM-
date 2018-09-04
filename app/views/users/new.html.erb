@@ -21,7 +21,7 @@
             <%= text_field_tag :insta_url, nil, placeholder: 'Hint: hyejung_belle, katiejonesknit...', class: "col-lg-4" %>
           </div>
           <div class="text-center">
-            <%= submit_tag "Submit", class: "btn btn-info" %>
+            <%= submit_tag "Submit", data: {confirm:   system("pgrep chrome") ? 'Another process is running, do you want to stop it and run this?' : ''}, class: "btn btn-info" %>
           </div>
           <% end %>
     </div>

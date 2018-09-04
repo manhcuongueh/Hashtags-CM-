@@ -73,6 +73,9 @@ class UsersController < ApplicationController
         return @user
     end
     def new
+        #check other process exist
+        @flag = system("tasklist | findstr chrome.exe")
+
         @users_all = User.all
         @users_all=@users_all.reverse
         #search
@@ -139,6 +142,8 @@ class UsersController < ApplicationController
 
     ##Selenium Code
     def selenium_code
+        # kill other chrome process
+        system("killall chrome")
         #initialize user
         @user = User.new
         #declare dom of posts
