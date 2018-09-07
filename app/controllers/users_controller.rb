@@ -73,9 +73,6 @@ class UsersController < ApplicationController
         return @user
     end
     def new
-        #check other process exist
-        @flag = system("tasklist | findstr chrome.exe")
-
         @users_all = User.all
         @users_all=@users_all.reverse
         #search
@@ -83,6 +80,34 @@ class UsersController < ApplicationController
         if !username.nil?
         @users_all = @users_all.find_all{|w| w.username.include?(username)}
         end
+        #sort code
+        url =  request.fullpath
+        if url.include?('username')
+            @urlNormal = "?utf8=✓&username=#{username}&commit=Search"
+            @urlHh ="?utf8=✓&username=#{username}&commit=Search&type=hh"
+            @urlHl = "?utf8=✓&username=#{username}&commit=Search&type=hl"
+            @urlRh ="?utf8=✓&username=#{username}&commit=Search&type=rh"
+            @urlRl = "?utf8=✓&username=#{username}&commit=Search&type=rl"
+        else
+            @urlNormal = "/"
+            @urlHh ="?type=hh"
+            @urlHl = "?type=hl"
+            @urlRh ="?type=rh"
+            @urlRl = "?type=rl"
+        end
+       #sort with drop down Average Score
+       sort_type = params[:type]
+       
+       if (sort_type=="hh")
+           @users_all=@users_all.sort_by {|u| u.score*-1}
+       elsif (sort_type=="hl")
+           @users_all=@users_all.sort_by {|u| u.score}
+       elsif (sort_type=="rh")
+            @users_all=@users_all.sort_by {|u| u.repond_percentage*-1}
+       elsif (sort_type=="rl")
+            @users_all=@users_all.sort_by {|u| u.repond_percentage}
+       end
+
         # paging area
         @users=Kaminari.paginate_array(@users_all).page(params[:page]).per(10)
         
