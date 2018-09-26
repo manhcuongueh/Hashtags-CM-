@@ -194,11 +194,11 @@ class UsersController < ApplicationController
             #declare date 
             date=[]
             #run chrome
-            #options = Selenium::WebDriver::Chrome::Options.new
-            #options.add_argument('--headless')
-            #options.add_argument('--no-sandbox')
-            #@@bot = Selenium::WebDriver.for :chrome, options: options
-            @@bot = Selenium::WebDriver.for :chrome
+            options = Selenium::WebDriver::Chrome::Options.new
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            @@bot = Selenium::WebDriver.for :chrome, options: options
+            #@@bot = Selenium::WebDriver.for :chrome
             @@bot.manage.window.maximize
             sleep 1
             #go to account page
