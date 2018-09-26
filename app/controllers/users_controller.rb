@@ -203,11 +203,11 @@ class UsersController < ApplicationController
             #declare date 
             date=[]
             #run chrome
-            #options = Selenium::WebDriver::Chrome::Options.new
-            #options.add_argument('--headless')
-            #options.add_argument('--no-sandbox')
-            #@@bot = Selenium::WebDriver.for :chrome, options: options
-            @@bot = Selenium::WebDriver.for :chrome
+            options = Selenium::WebDriver::Chrome::Options.new
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            @@bot = Selenium::WebDriver.for :chrome, options: options
+            #@@bot = Selenium::WebDriver.for :chrome
             @@bot.manage.window.maximize
             sleep 1
             #go to account page
@@ -276,8 +276,8 @@ class UsersController < ApplicationController
                                     @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
                                     sleep 0.5
                                     #using username and password to login
-                                    @@bot.find_element(:id, 'id_username').send_keys 'cuong_manh248'
-                                    @@bot.find_element(:id, 'id_password').send_keys '24081991'
+                                    @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
+                                    @@bot.find_element(:id, 'id_password').send_keys '515173'
                                     @@bot.find_element(:class, 'button-green').click
                                     sleep 0.5
                                     @@bot.navigate.to "#{post_dom[i][0]}"  
