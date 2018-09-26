@@ -121,7 +121,7 @@ class UsersController < ApplicationController
             check = Status.find_by_username(url)
             if check.nil?
                 Status.create(
-                    username: url,
+                    username: url.delete(' '),
                     status: 'Waiting'
                 )
             end
