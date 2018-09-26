@@ -8,11 +8,12 @@
         </div>
     </div>
     <div class="container">
-        <table style="width:80%">
+        <table style="width:100%">
         <thead>
             <th><h4>No</h4></th>
             <th><h4>IDs</h4></th>
             <th><h4>Status</h4></th>
+            <th><h4><%= button_to "Clean All Data", status_path, :method => :delete, data: {confirm: 'Are you sure to delete the data?'}, class:  'btn btn-primary'%></h4></th>
         </thead>
         <tbody>
             <% @statuses.each do |status|%>

@@ -114,7 +114,24 @@ class UsersController < ApplicationController
     end
     
     def create
-       selenium_code
+        submitType = params[:commit]
+        list_url = params[:insta_url]
+        list_url = list_url.split(',')
+        for url in list_url
+            check = Status.find_by_username(url)
+            if check.nil?
+                Status.create(
+                    username: url,
+                    status: 'Waiting'
+                )
+            end
+        end
+        if submitType == "Add to List"
+            flash[:success] = "IDs was added to list"
+            redirect_to root_path
+        else
+            selenium_code
+        end
         
     end
     
@@ -169,22 +186,14 @@ class UsersController < ApplicationController
     def selenium_code
         # kill other chrome process
         system("killall chrome")
-        #Get Instagram Url
-        #insta_url=params[:insta_url]
-        list_url = params[:insta_url]
-        list_url = list_url.split(',')
-        #Delete old IDs and Store new IDs
-        Status.destroy_all
-        for url in list_url
-            @status = Status.create(
-                username: url,
-                status: 'Waiting'
-            )
+        list_running = Status.where('status=?', 'Running')
+        for l in list_running
+            l.update_attribute(:status,'Waiting')
         end
-        for url in list_url
+        while Status.where('status=?', 'Waiting').first.present?
+            account = Status.where('status=?', 'Waiting').first
             #set status for an ID
-            currentUser = Status.find_by_username(url)
-            currentUser.update_attribute(:status,'Running')
+            account.update_attribute(:status,'Running')
             #initialize user
             @user = User.new
             #declare dom of posts
@@ -194,15 +203,15 @@ class UsersController < ApplicationController
             #declare date 
             date=[]
             #run chrome
-            options = Selenium::WebDriver::Chrome::Options.new
-            options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            @@bot = Selenium::WebDriver.for :chrome, options: options
-            #@@bot = Selenium::WebDriver.for :chrome
+            #options = Selenium::WebDriver::Chrome::Options.new
+            #options.add_argument('--headless')
+            #options.add_argument('--no-sandbox')
+            #@@bot = Selenium::WebDriver.for :chrome, options: options
+            @@bot = Selenium::WebDriver.for :chrome
             @@bot.manage.window.maximize
             sleep 1
             #go to account page
-            @@bot.navigate.to "https://www.instagram.com/#{url.delete(' ')}"
+            @@bot.navigate.to "https://www.instagram.com/#{account.username}"
             sleep 1   
             if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div').size >0 
                 @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
@@ -267,8 +276,8 @@ class UsersController < ApplicationController
                                     @@bot.navigate.to "https://www.instagram.com/accounts/login/?force_classic_login"
                                     sleep 0.5
                                     #using username and password to login
-                                    @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
-                                    @@bot.find_element(:id, 'id_password').send_keys '515173'
+                                    @@bot.find_element(:id, 'id_username').send_keys 'cuong_manh248'
+                                    @@bot.find_element(:id, 'id_password').send_keys '24081991'
                                     @@bot.find_element(:class, 'button-green').click
                                     sleep 0.5
                                     @@bot.navigate.to "#{post_dom[i][0]}"  
@@ -440,12 +449,12 @@ class UsersController < ApplicationController
                     @user.level = level
                     @user.repond_percentage = respond_percentage
                 @user.save
-                currentUser.update_attribute(:status,'Done')
+                account.update_attribute(:status,'Done')
             else 
-                currentUser.update_attribute(:status,'Invalid ID')
+                account.update_attribute(:status,'Invalid ID')
                 @@bot.quit()
             end
         end
-        redirect_to root_path
+        redirect_to status_path
     end
 end
