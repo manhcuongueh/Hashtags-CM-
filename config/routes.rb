@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   get  'index' => 'users#index'
   get  'percentage' => 'percentage#show'
   post 'index' => 'users#create'
+  get  'status' => 'status#index'
   post '' => 'users#delete'
   get  'api/user' => 'api#user_json'
   get  'api/hashtag' => 'api#hashtag_json'

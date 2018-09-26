@@ -1,0 +1,31 @@
+ <br>
+<div class="alert alert-primary" role="alert">
+    
+    <div class="container text-center">
+        <div>
+           
+        <h2 class="title">Crawling Status</h2>
+        </div>
+    </div>
+    <div class="container">
+        <table style="width:80%">
+        <thead>
+            <th><h4>No</h4></th>
+            <th><h4>IDs</h4></th>
+            <th><h4>Status</h4></th>
+        </thead>
+        <tbody>
+            <% @statuses.each do |status|%>
+                <tr>
+                <td><h5><%=@statuses.index(status)+1%></h5></td>
+                <td><h5><%=status.username%></h5></td>
+                <td><h5><%=status.status%></h5></td>
+                <% if status.status == "Running" %>
+                <td><i class="fa fa-spinner fa-spin" style="font-size:24px;color:red"></i></td>
+                <%end%>
+                </tr>
+                <%end%>
+        </tbody>
+        </table>
+    </div>
+</div>
