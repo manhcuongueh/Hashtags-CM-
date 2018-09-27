@@ -347,7 +347,12 @@ class UsersController < ApplicationController
                     #pass send an emoji
                     begin
                     @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').send_keys i[0]
-                    while @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a[1]/div/div/div[2]').size==0
+                    sleep 1.0
+                    # wait for result or check no result found 
+                    while @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a[1]/div/div/div[2]').size==0 ||
+                        @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/div').size > 0
+                        @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').clear
+                        @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').send_keys i[0]
                         sleep 1.0
                     end
                     #hashtags -global use
