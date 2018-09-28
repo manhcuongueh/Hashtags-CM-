@@ -443,6 +443,10 @@ class UsersController < ApplicationController
                     total_reply_times = total_reply_times + post.reply_time
                     all_cm = all_cm+post.total_cm
                 end
+                # avoiding divide 0
+                if all_cm == 0
+                    all_cm =1
+                end
                 respond_percentage=total_reply_times.to_f/all_cm
                 #save user 
                     @user.username = username
