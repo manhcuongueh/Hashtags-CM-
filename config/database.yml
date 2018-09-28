@@ -12,7 +12,6 @@
 default: &default
   adapter: mysql2
   pool: 5
-  port: 3307
   username: root
   password: Parastar2018
   socket: /var/run/mysqld/mysqld.sock
