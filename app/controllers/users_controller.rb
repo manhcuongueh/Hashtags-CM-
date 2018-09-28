@@ -342,38 +342,47 @@ class UsersController < ApplicationController
                 appearance = appearance.last(20).reverse
                 #Crawl used time by global
                 sum =0; 
+                @@bot.navigate.to "https://www.instagram.com/#{username}"
                 for i in appearance
-                    @@bot.navigate.to "https://www.instagram.com/#{username}"
                     #pass send an emoji
                     begin
+                    @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').clear
                     @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').send_keys i[0]
                     sleep 1.0
                     # wait for result or check no result found 
-                    while @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a[1]/div/div/div[2]').size==0 ||
-                        @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/div').size > 0
-                        @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').clear
-                        @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').send_keys i[0]
-                        sleep 1.0
+                    for count in 0..2
+                        if @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a[1]/div/div/div[2]').size==0
+                            @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').clear
+                            @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').send_keys i[0]
+                            sleep 1.0
+                        else 
+                            break
+                        end
                     end
                     #hashtags -global use
-                    appearance_time = @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a/div/div/div[2]/span/span').text
-                    appearance_time =appearance_time.gsub(',','').to_i
-                        #get availability
-                        if appearance_time.to_i > 0.16*followers
-                            availability = "X"
-                        else
-                            availability = "0"
-                        end
+                    if @@bot.find_elements(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/div').size > 0
+                        appearance_time = 0
+                    else
+                        appearance_time = @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a/div/div/div[2]/span/span').text
+                        appearance_time =appearance_time.gsub(',','').to_i
+
+                    end
+                    #get availability
+                    if appearance_time.to_i > 0.16*followers
+                         availability = "X"
+                    else
+                         availability = "0"
+                    end
                         #get sum 
-                        if availability =="0" && appearance.index(i) < 5
-                            sum = sum + i[1] * appearance_time.to_i
-                        end
-                        @user.hashtags.new(
-                            hashtags: i[0], 
-                            use_by_user:i[1],
-                            use_by_global: appearance_time,
-                            avai: availability
-                            )
+                    if availability =="0" && appearance.index(i) < 5
+                        sum = sum + i[1] * appearance_time.to_i
+                    end
+                    @user.hashtags.new(
+                        hashtags: i[0], 
+                        use_by_user:i[1],
+                        use_by_global: appearance_time,
+                        avai: availability
+                        )
                     #catach an emoji hashtag
                     rescue 
                         begin
@@ -442,10 +451,6 @@ class UsersController < ApplicationController
                 for post in @user.percentages
                     total_reply_times = total_reply_times + post.reply_time
                     all_cm = all_cm+post.total_cm
-                end
-                # avoiding divide 0
-                if all_cm == 0
-                    all_cm =1
                 end
                 respond_percentage=total_reply_times.to_f/all_cm
                 #save user 
