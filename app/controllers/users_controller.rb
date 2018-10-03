@@ -191,7 +191,7 @@ class UsersController < ApplicationController
             l.update_attribute(:status,'Waiting')
         end
         while Status.where('status=?', 'Waiting').first.present?
-            account = Status.where('username=?', 'hye_jin85').first
+            account = Status.where('status=?', 'Waiting').first
             #set status for an ID
             account.update_attribute(:status,'Loading')
             #initialize user
