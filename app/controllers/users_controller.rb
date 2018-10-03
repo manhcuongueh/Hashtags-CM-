@@ -319,7 +319,6 @@ class UsersController < ApplicationController
                                
                             end
                         end 
-                        puts hashtags
                         #find percentage
                         dom_li=dom_comment=@@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li')
                         dom_li.shift   
