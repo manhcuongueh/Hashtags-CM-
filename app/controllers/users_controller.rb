@@ -118,7 +118,7 @@ class UsersController < ApplicationController
         list_url = params[:insta_url]
         list_url = list_url.split(',')
         for url in list_url
-            check = Status.find_by_username(url)
+            check = Status.find_by_username(url.delete(' '))
             if check.nil?
                 Status.create(
                     username: url.delete(' '),
@@ -186,14 +186,14 @@ class UsersController < ApplicationController
     def selenium_code
         # kill other chrome process
         system("killall chrome")
-        list_running = Status.where('status=?', 'Running')
+        list_running = Status.where('status=?', 'Loading')
         for l in list_running
             l.update_attribute(:status,'Waiting')
         end
         while Status.where('status=?', 'Waiting').first.present?
-            account = Status.where('status=?', 'Waiting').first
+            account = Status.where('username=?', 'hye_jin85').first
             #set status for an ID
-            account.update_attribute(:status,'Running')
+            account.update_attribute(:status,'Loading')
             #initialize user
             @user = User.new
             #declare dom of posts
@@ -214,7 +214,7 @@ class UsersController < ApplicationController
             @@bot.navigate.to "https://www.instagram.com/#{account.username}"
             sleep 1   
             if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div').size >0 
-                @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
+                @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/button').click
                 #get followers
                 begin
                     doc = Nokogiri::HTML(open(@@bot.current_url))
@@ -251,7 +251,7 @@ class UsersController < ApplicationController
                     @@bot.navigate.to "#{post_dom[i][0]}"
                     # get date of first post and date of last post
                     if i==0 ||i==post_dom.length-1 
-                        date.push(@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[2]/a/time')['title'])
+                        date.push(@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div/a/time')['title'])
                     end
                     # pass load more comment 
                     start_time= Time.now
@@ -294,7 +294,7 @@ class UsersController < ApplicationController
                                     @@bot.manage.window.maximize
                                     @@bot.navigate.to "#{post_dom[i][0]}"
                                     sleep 0.5
-                                    @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/a').click
+                                    @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/button').click
                                     k=0
                                     start_time= Time.now
                                 end
@@ -307,32 +307,39 @@ class UsersController < ApplicationController
                     if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul').size>0      
                         dom_comment=@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul')
                         #times Instagramer answer comments
-                        reply_time=-1
+                        reply_time= 0 
                         #find hashtags
                         dom_a=dom_comment.find_elements(:tag_name, 'a')
                         for d in dom_a
                             if d.text.include? "#"      
                                 hashtags.push(d.text)
                             end
-                            if d.text == username
-                                reply_time=reply_time+1
+                            if d.text == username && d != dom_a.first
+                               reply_time=reply_time+1 
+                               
                             end
-                        end  
+                        end 
+                        puts hashtags
                         #find percentage
                         dom_li=dom_comment=@@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li')
                         dom_li.shift   
+                        total_cm = dom_li.length
                         #set percentage    
-                        if dom_li.length== 0
+                        if dom_li.length == 0
                             percentage =0
                         else
                             percentage = reply_time.to_f/dom_li.length
                         end
+                    else
+                        reply_time = 0
+                        total_cm = 0
+                        percentage = 0
                     end 
                         @user.percentages.new(
                             link: post_dom[i][0],
                             image: post_dom[i][1],
                             reply_time: reply_time,
-                            total_cm: dom_li.length,
+                            total_cm: total_cm,
                             percentage: percentage
                         )
                 end
@@ -451,6 +458,10 @@ class UsersController < ApplicationController
                 for post in @user.percentages
                     total_reply_times = total_reply_times + post.reply_time
                     all_cm = all_cm+post.total_cm
+                end
+                # avoiding divide 0
+                if all_cm == 0
+                    all_cm =1
                 end
                 respond_percentage=total_reply_times.to_f/all_cm
                 #save user 
