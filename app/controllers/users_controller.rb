@@ -281,7 +281,7 @@ class UsersController < ApplicationController
                                     @@bot.find_element(:class, 'button-green').click
                                     sleep 0.5
                                     @@bot.navigate.to "#{post_dom[i][0]}"  
-                                    @@bot.action.send_keys(:end).perform
+                                    @@bot.navigate.to "https://www.instagram.com/accounts/logout/"
                                     k=1
                                     start_time= Time.now
                                 else  
