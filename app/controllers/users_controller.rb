@@ -186,14 +186,14 @@ class UsersController < ApplicationController
     def selenium_code
         # kill other chrome process
         system("killall chrome")
-        list_running = Status.where('status=?', 'Loading')
+        list_running = Status.where('status=?', 'Running')
         for l in list_running
             l.update_attribute(:status,'Waiting')
         end
         while Status.where('status=?', 'Waiting').first.present?
             account = Status.where('status=?', 'Waiting').first
             #set status for an ID
-            account.update_attribute(:status,'Loading')
+            account.update_attribute(:status,'Running')
             #initialize user
             @user = User.new
             #declare dom of posts
@@ -257,7 +257,7 @@ class UsersController < ApplicationController
                     start_time= Time.now
                     while @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button').size > 0 do
                         if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button[@disabled=""]').size > 0
-                            sleep 3
+                            sleep 1.5
                         else
                             @@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button').click
                             sleep 0.5
@@ -281,6 +281,7 @@ class UsersController < ApplicationController
                                     @@bot.find_element(:class, 'button-green').click
                                     sleep 0.5
                                     @@bot.navigate.to "#{post_dom[i][0]}"  
+                                    @@bot.action.send_keys(:end).perform
                                     k=1
                                     start_time= Time.now
                                 else  
@@ -290,7 +291,6 @@ class UsersController < ApplicationController
                                     options.add_argument('--no-sandbox')
                                     @@bot = Selenium::WebDriver.for :chrome, options: options
                                     #@@bot = Selenium::WebDriver.for :chrome
-                                    @@bot.manage.window.maximize
                                     @@bot.manage.window.maximize
                                     @@bot.navigate.to "#{post_dom[i][0]}"
                                     sleep 0.5
