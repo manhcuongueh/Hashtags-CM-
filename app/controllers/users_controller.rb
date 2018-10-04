@@ -279,9 +279,12 @@ class UsersController < ApplicationController
                                     @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
                                     @@bot.find_element(:id, 'id_password').send_keys '515173'
                                     @@bot.find_element(:class, 'button-green').click
-                                    sleep 0.5
-                                    @@bot.navigate.to "#{post_dom[i][0]}"  
+                                    sleep 0.5 
                                     @@bot.navigate.to "https://www.instagram.com/accounts/logout/"
+                                    sleep 0.5
+                                    @@bot.navigate.to "#{post_dom[i][0]}" 
+                                    sleep 0.5
+                                    @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/button').click
                                     k=1
                                     start_time= Time.now
                                 else  
