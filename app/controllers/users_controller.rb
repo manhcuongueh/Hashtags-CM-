@@ -308,10 +308,11 @@ class UsersController < ApplicationController
                         dom_comment = @@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul')
                         #find hashtags
                         reply_doms = dom_comment.find_elements(:xpath, "li/div/div/div/a[@title='#{username}']")
-                        if reply_doms.first.text == username
+                        if reply_doms.size > 0 && reply_doms.first.text == username
                             reply_time = reply_doms.size - 1
                         else
                             reply_time = reply_doms.size
+                
                         end
                         hashtag_doms = dom_comment.find_elements(:xpath, "li/div/div/div/span/a[contains(@href,'explore/tags')]")
                         for d in hashtag_doms
