@@ -215,21 +215,17 @@ class UsersController < ApplicationController
             sleep 1   
             if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div').size >0 
                 @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/button').click
-                #get followers
-                begin
-                    doc = Nokogiri::HTML(open(@@bot.current_url))
-                    acc = doc.text
-                    acc = acc.split('"edge_followed_by":{"count":')[1]
-                    followers = (acc.split('},"followed_by_viewer"')[0]).to_i            
-                end
+                #get followers 
+                followers = @@bot.find_element(:xpath, '/html/body/span/section/main/div/header/section/ul/li[2]/a/span')['title']
+                followers = followers.gsub(',','').to_i
                 #get account_id
                 username = @@bot.find_element(:xpath, '/html/body/span/section/main/div/header/section/div[1]/h1').text
                 #scroll down the account page and save dom
-                for i in 0..8
+                for i in 0..9
                     @@bot.action.send_keys(:end).perform
                     sleep 1
                     #save dom after 8 times press page down button
-                    if i%4==0
+                    if i%3==0
                         # elements contain the content of a post
                         dom=@@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div/div/div/div')
                         for i in dom
@@ -249,6 +245,10 @@ class UsersController < ApplicationController
                 k=0
                 for i in 0..post_dom.length-1  
                     @@bot.navigate.to "#{post_dom[i][0]}"
+                    #get all comments
+                    total_cm = @@bot.page_source
+                    total_cm = total_cm.split('"edge_media_to_comment":{"count":')[1]
+                    total_cm = total_cm.split(',"page_info":{"')[0].to_i
                     # get date of first post and date of last post
                     if i==0 ||i==post_dom.length-1 
                         date.push(@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div/a/time')['title'])
@@ -256,16 +256,10 @@ class UsersController < ApplicationController
                     # pass load more comment 
                     start_time= Time.now
                     while @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button').size > 0 do
-                        if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button[@disabled=""]').size > 0
-                            sleep 1.5
-                        else
-                            @@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button').click
-                            sleep 0.5
-                        end
-                        if (Time.now > start_time + 60)
-                            sleep 3 
-                            if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button[@disabled=""]').size > 0                    
-                                if k==0 
+                        while @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button[@disabled=""]').size > 0 do
+                            sleep 1
+                            if (Time.now > start_time + 20) 
+                                if k == 0
                                     @@bot.quit()
                                     options = Selenium::WebDriver::Chrome::Options.new
                                     options.add_argument('--headless')
@@ -279,15 +273,10 @@ class UsersController < ApplicationController
                                     @@bot.find_element(:id, 'id_username').send_keys 'minhho402'
                                     @@bot.find_element(:id, 'id_password').send_keys '515173'
                                     @@bot.find_element(:class, 'button-green').click
-                                    sleep 0.5 
-                                    @@bot.navigate.to "https://www.instagram.com/accounts/logout/"
-                                    sleep 0.5
                                     @@bot.navigate.to "#{post_dom[i][0]}" 
                                     sleep 0.5
-                                    @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/button').click
                                     k=1
-                                    start_time= Time.now
-                                else  
+                                else    
                                     @@bot.quit()
                                     options = Selenium::WebDriver::Chrome::Options.new
                                     options.add_argument('--headless')
@@ -299,63 +288,64 @@ class UsersController < ApplicationController
                                     sleep 0.5
                                     @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[3]/div/div/section/div/button').click
                                     k=0
-                                    start_time= Time.now
                                 end
-                            else
-                                start_time= Time.now
                             end
                         end
+                            if @@bot.find_elements(:xpath, '/html/body/span/section/div/span').size > 0 
+                                @@bot.find_elements(:xpath, '/html/body/span/section/div/span').click
+                            end
+                            @@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[2]/button').click
+                            start_time= Time.now
+                            sleep 0.5
+                            #limit at 1000 comments
+                            comment_size = @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li').size
+                            if  comment_size > 999
+                                break
+                            end
                     end
                     
-                    if @@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul').size>0      
-                        dom_comment=@@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul')
-                        #times Instagramer answer comments
-                        reply_time= 0 
+                    if total_cm > 0      
+                        dom_comment = @@bot.find_element(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul')
                         #find hashtags
-                        dom_a=dom_comment.find_elements(:tag_name, 'a')
-                        for d in dom_a
-                            if d.text.include? "#"      
-                                hashtags.push(d.text)
-                            end
-                            if d.text == username && d != dom_a.first
-                               reply_time=reply_time+1 
-                               
-                            end
-                        end 
-                        #find percentage
-                        dom_li=dom_comment=@@bot.find_elements(:xpath, '/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li')
-                        dom_li.shift   
-                        total_cm = dom_li.length
-                        #set percentage    
-                        if dom_li.length == 0
-                            percentage =0
+                        reply_doms = dom_comment.find_elements(:xpath, "li/div/div/div/a[@title='#{username}']")
+                        if reply_doms.first.text == username
+                            reply_time = reply_doms.size - 1
                         else
-                            percentage = reply_time.to_f/dom_li.length
+                            reply_time = reply_doms.size
                         end
+                        hashtag_doms = dom_comment.find_elements(:xpath, "li/div/div/div/span/a[contains(@href,'explore/tags')]")
+                        for d in hashtag_doms
+                            hashtags.push(d.text)
+                        end
+                        #set percentage    
+                        if total_cm > 999
+                            percentage = reply_time.to_f/comment_size
+                        else
+                            percentage = reply_time.to_f/total_cm
+                        end
+                        
                     else
                         reply_time = 0
-                        total_cm = 0
                         percentage = 0
                     end 
-                        @user.percentages.new(
-                            link: post_dom[i][0],
-                            image: post_dom[i][1],
-                            reply_time: reply_time,
-                            total_cm: total_cm,
-                            percentage: percentage
-                        )
+                    @user.percentages.new(
+                        link: post_dom[i][0],
+                        image: post_dom[i][1],
+                        reply_time: reply_time,
+                        total_cm: total_cm,
+                        percentage: percentage
+                    )                
                 end
                 #calculate appearance times
                 appearance = hashtags.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
                 appearance = appearance.sort_by {|_key, value| value}
                 appearance = appearance.last(20).reverse
                 #Crawl used time by global
-                sum =0; 
-                @@bot.navigate.to "https://www.instagram.com/#{username}"
+                sum = 0; 
                 for i in appearance
+                    @@bot.navigate.to "https://www.instagram.com/#{username}"
                     #pass send an emoji
                     begin
-                    @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').clear
                     @@bot.find_element(:xpath, '/html/body/span/section/nav/div[2]/div/div/div[2]/input').send_keys i[0]
                     sleep 1.0
                     # wait for result or check no result found 
@@ -395,7 +385,6 @@ class UsersController < ApplicationController
                     #catach an emoji hashtag
                     rescue 
                         begin
-                        @@bot.navigate.to "https://www.instagram.com/explore/tags/#{URI.encode(i[0].remove("#"))}"
                         url=URI.parse "https://www.instagram.com/explore/tags/#{URI.encode(i[0].remove("#"))}"
                         doc = Nokogiri::HTML(open(url))
                         appearance_time = doc.text
@@ -422,7 +411,7 @@ class UsersController < ApplicationController
                             @user.hashtags.new(
                                 hashtags: i[0], 
                                 use_by_user:i[1],
-                                use_by_global: 120,
+                                use_by_global: 0,
                                 avai: "null"
                                 )
                         end
@@ -459,13 +448,13 @@ class UsersController < ApplicationController
                 all_cm= 0
                 for post in @user.percentages
                     total_reply_times = total_reply_times + post.reply_time
-                    all_cm = all_cm+post.total_cm
+                    all_cm = all_cm + post.total_cm
                 end
                 # avoiding divide 0
                 if all_cm == 0
-                    all_cm =1
+                    all_cm = 1
                 end
-                respond_percentage=total_reply_times.to_f/all_cm
+                respond_percentage = total_reply_times.to_f/all_cm
                 #save user 
                     @user.username = username
                     @user.date_start = date[0]
